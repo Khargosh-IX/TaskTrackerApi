@@ -2,6 +2,8 @@
 
 TaskTrackerApi is an advanced RESTful API built using the CodeIgniter 3 framework. It provides a comprehensive task management system with user authentication and authorization using token-based bearer token authentication.
 
+![Screenshot-20230513172045-1471x872.png](showcase%2FScreenshot-20230513172045-1471x872.png)
+
 ## Features
 
 - User Management:
