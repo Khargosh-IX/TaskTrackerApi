@@ -33,13 +33,13 @@ class Task extends CI_Controller
         $this->task();
     }
 
-	public function task()
+	public function task($id = '')
 	{
 
 		switch($this->REQUEST_METHOD){
 			case "GET":
 
-                $response = $this->fetch();
+                $response = $this->fetch($id);
 
 				break;
 
@@ -72,13 +72,15 @@ class Task extends CI_Controller
 		$this->core->outputResponse($response, $response['http_response_code']);
 	}
 
-	private function fetch()
+	private function fetch($id)
 	{
 		$response = ['http_response_code' => 200, 'status' => 0, 'message' => 'Data not found'];
 
+        !empty($id) ? $this->db->where('id', $id) : "";
 		$this->db->where('user_id', $this->AUTH_USER);
 		if($this->db->get('task')->num_rows() > 0){
 
+            !empty($id) ? $this->db->where('id', $id) : "";
 			$this->db->where('user_id', $this->AUTH_USER);
 
 			$response = [
