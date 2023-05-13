@@ -33,6 +33,8 @@ git clone https://github.com/your-username/TaskTrackerApi.git
 
 ## Sign up
 POST /authentication/processSignUp
+
+Content-Type: multipart/form-data
 ```
 "username": "johndoe",
 "name": "Jhon Doe",
@@ -40,7 +42,9 @@ POST /authentication/processSignUp
 ```
 
 ## Sign in
-POST /authentication
+POST /authentication 
+
+Content-Type: multipart/form-data
 ```
 "username": "johndoe",
 "password": "password123"
@@ -60,11 +64,24 @@ DELETE /authentication
 ## Get Current User Info
 GET /user
 
+## Update Current User Info
+PUT /user
+
+Content-Type: text/plain
+```
+"username": "johndoe",
+"name": "Jhon Doe",
+"old_password": "password123",
+"new_password": "password456"
+```
+
 # Get task lists
 GET /tasks
 
 ## Create a new task
 POST /task
+
+Content-Type: text/plain
 ```
 "title": "Buy groceries",
 "Description": "Buy milk, eggs, and bread",
@@ -76,6 +93,8 @@ GET /task/1
 
 ## Update a specific task
 PUT /task/
+
+Content-Type: text/plain
 ```
 "id": "1",
 "task_name": "Buy groceries",
@@ -85,6 +104,8 @@ PUT /task/
 
 # Delete a specific task
 DELETE /tasks
+
+Content-Type: text/plain
 ```
 "id": "1",
 ```
