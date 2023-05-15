@@ -33,10 +33,14 @@ git clone https://github.com/your-username/TaskTrackerApi.git
 
 ## API Endpoints
 
+Headers
+
+```
+Content-Type : application/json
+```
+
 ## Sign up
 POST /authentication/processSignUp
-
-Content-Type: multipart/form-data
 ```
 "username": "johndoe",
 "name": "Jhon Doe",
@@ -46,7 +50,6 @@ Content-Type: multipart/form-data
 ## Sign in
 POST /authentication 
 
-Content-Type: multipart/form-data
 ```
 "username": "johndoe",
 "password": "password123"
@@ -56,8 +59,11 @@ After Signing in you will receive a token in the response body
 
 1. In your Further Request add the following header.
 2. Replace <your_token> with the signin token
+
+Headers
+
 ```
-Authorization: Bearer <your_token>
+HTTP_AUTHORIZATION : Bearer [YOUR TOKEN]
 ```
 
 ## Sign Out
@@ -68,8 +74,6 @@ GET /user
 
 ## Update Current User Info
 PUT /user
-
-Content-Type: text/plain
 ```
 "username": "johndoe",
 "name": "Jhon Doe",
@@ -78,12 +82,10 @@ Content-Type: text/plain
 ```
 
 # Get task lists
-GET /tasks
+GET /task
 
 ## Create a new task
 POST /task
-
-Content-Type: text/plain
 ```
 "title": "Buy groceries",
 "Description": "Buy milk, eggs, and bread",
@@ -91,26 +93,19 @@ Content-Type: text/plain
 ```
 
 ## Get information about a specific task
-GET /task/1
+GET /task/task/1
 
 ## Update a specific task
-PUT /task/
+PUT /task/task/1
 
-Content-Type: text/plain
 ```
-"id": "1",
 "task_name": "Buy groceries",
 "task_description": "Buy milk, eggs, and bread",
 "task_status": "completed"
 ```
 
 # Delete a specific task
-DELETE /tasks
-
-Content-Type: text/plain
-```
-"id": "1",
-```
+DELETE /task/1
 
 <!-- LICENSE -->
 ## License

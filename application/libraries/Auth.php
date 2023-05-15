@@ -117,18 +117,18 @@ class Auth
 
 
 	//Start Sign-up process
-	public function processSignup()
+	public function processSignup($input)
 	{
         //validate if user already exists
-        $this->CI_OBJECT->db->where('username', filter($this->CI_OBJECT->input->post('username')));
+        $this->CI_OBJECT->db->where('username', filter($input['username']));
         $this->CI_OBJECT->db->where('status', 1);
         if(!($this->CI_OBJECT->db->get('user')->num_rows() > 0)) {
 
             //begin processing of user registration
             $userData = array(
-                'name' => filter($this->CI_OBJECT->input->post('name')),
-                'username' => filter($this->CI_OBJECT->input->post('username')),
-                'password' => password_hash(filter($this->CI_OBJECT->input->post('password')), PASSWORD_BCRYPT)
+                'name' => filter($input['name']),
+                'username' => filter($input['username']),
+                'password' => password_hash(filter($input['password']), PASSWORD_BCRYPT)
             );
 
             if ($this->CI_OBJECT->db->insert('user', $userData)) {
@@ -203,12 +203,11 @@ class Auth
 
 	public function processSignIn($request = "authenticateUser", array $data = [])
 	{
-
 		switch ($request) {
 
 			case "authenticateUser":
-				$username = filter($this->CI_OBJECT->input->post('username'));
-				$password = filter($this->CI_OBJECT->input->post('password'));
+				$username = filter($data['username']);
+				$password = filter($data['password']);
 
 				$this->verifyUser($username, $password);
 

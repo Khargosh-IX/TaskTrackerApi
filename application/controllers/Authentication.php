@@ -3,9 +3,10 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Authentication extends CI_Controller {
-
 	private array $AUTH_RESPONSE;
 	private $REQUEST_METHOD;
+    
+    private $finput;
 
 	public function __construct()
 	{
@@ -13,6 +14,10 @@ class Authentication extends CI_Controller {
 
 		$this->load->library('auth');
 		$this->REQUEST_METHOD = $_SERVER['REQUEST_METHOD'];
+
+        $_POST = [];
+        $this->finput = json_decode(file_get_contents("php://input"), true) ?? [];
+        $this->form_validation->set_data($this->finput) ?? [];
 	}
 
 	public function index()
@@ -32,7 +37,6 @@ class Authentication extends CI_Controller {
 
 	public function processUserAccess()
 	{
-
 		switch ($this->REQUEST_METHOD) {
 			case "POST":
 
@@ -63,9 +67,9 @@ class Authentication extends CI_Controller {
 		$this->core->outputResponse($response, $response['http_response_code']);
 	}
 
-	private function processSignIn() : array {
-
-		$this->form_validation->set_rules('username', 'username', 'required');
+	private function processSignIn() : array
+    {
+		$this->form_validation->set_rules('username', 'Username', 'required');
 		$this->form_validation->set_rules('password', 'Password', 'required');
 
 		if ($this->form_validation->run() === FALSE) {
@@ -78,7 +82,7 @@ class Authentication extends CI_Controller {
 
 		} else {
 
-			$AuthResponse = $this->auth->processSignIn();
+			$AuthResponse = $this->auth->processSignIn("authenticateUser" , $this->finput);
 
 			if ($AuthResponse['status'] === 1) {
 
@@ -113,7 +117,6 @@ class Authentication extends CI_Controller {
 
 	public function processSignUp()
 	{
-
         switch ($this->REQUEST_METHOD) {
             case "POST":
 
@@ -131,7 +134,7 @@ class Authentication extends CI_Controller {
 
                 } else {
 
-                    $response = $this->auth->processSignup();
+                    $response = $this->auth->processSignup($this->finput);
 
                 }
 
@@ -148,7 +151,6 @@ class Authentication extends CI_Controller {
 
 		//Output json response
 		$this->core->outputResponse($response, $response['http_response_code']);
-
 	}
 
 }

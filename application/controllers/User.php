@@ -26,6 +26,9 @@ class User extends CI_Controller
             $this->core->outputResponse($response, $response['http_response_code']);
         }
 
+        $_POST = [];
+        $this->finput = json_decode(file_get_contents("php://input"), true) ?? [];
+        $this->form_validation->set_data($this->finput) ?? [];
 	}
 
     public function index() {
@@ -90,12 +93,8 @@ class User extends CI_Controller
 	{
 		$response = ['http_response_code' => 500, 'status' => 0, 'message' => 'Error occurred while requesting'];
 
-		$input_data = json_decode(file_get_contents("php://input"), true);
-
-		$this->form_validation->set_data($input_data);
 		$this->form_validation->set_rules('name', 'Name', 'required');
 		$this->form_validation->set_rules('username', 'Username', 'required');
-
 		if ($this->form_validation->run() === FALSE) {
 
 			$response = ['http_response_code' => 403 , 'status' => 0, 'message' => strip_tags(validation_errors())];
@@ -104,23 +103,23 @@ class User extends CI_Controller
 
 			$pass_process_completed = TRUE;
 			$data = [
-				'name' => filter($input_data['name']),
-				'username' => filter($input_data['username'])
+				'name' => filter($this->finput['name']),
+				'username' => filter($this->finput['username'])
 			];
 
-			if(!empty($input_data['new_password'])){
+			if(!empty($this->finput['new_password'])){
 
-                if(empty($input_data['old_password'])){
+                if(empty($this->finput['old_password'])){
                     return ['http_response_code' => 403 , 'status' => 0, 'message' => "Old password must not be empty"];
                 }
 
-                $userData = $this->auth->getUserData(filter($input_data['username']), 'username');
+                $userData = $this->auth->getUserData(filter($this->finput['username']), 'username');
 
                 $password_hash = $userData->password;
 
-				if(password_verify(filter($input_data['old_password']), $password_hash)){
+				if(password_verify(filter($this->finput['old_password']), $password_hash)){
 
-					$data['password'] = password_hash(filter($input_data['new_password']), PASSWORD_BCRYPT);
+					$data['password'] = password_hash(filter($this->finput['new_password']), PASSWORD_BCRYPT);
 
 				}else{
 

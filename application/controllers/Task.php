@@ -7,6 +7,7 @@ class Task extends CI_Controller
 	private array $AUTH_RESPONSE;
 	private int $AUTH_USER;
 	private string $REQUEST_METHOD;
+    private $finput;
 
 	public function __construct()
 	{
@@ -26,6 +27,8 @@ class Task extends CI_Controller
             $this->core->outputResponse($response, $response['http_response_code']);
         }
 
+        $_POST = [];
+        $this->finput = json_decode(file_get_contents("php://input"), true) ?? [];
 	}
 
     public function index()
@@ -35,6 +38,7 @@ class Task extends CI_Controller
 
 	public function task($id = '')
 	{
+        $this->form_validation->set_data(array_merge($this->finput, ['id' => $id])) ?? [];
 
 		switch($this->REQUEST_METHOD){
 			case "GET":
@@ -51,13 +55,13 @@ class Task extends CI_Controller
 
 			case "PUT":
 
-                $response = $this->update();
+                $response = $this->update($id);
 
 				break;
 
             case "DELETE":
 
-                $response = $this->delete();
+                $response = $this->delete($id);
 
                 break;
 			default :
@@ -97,11 +101,8 @@ class Task extends CI_Controller
     {
         $response = ['http_response_code' => 500, 'status' => 0, 'message' => 'Error occurred while requesting'];
 
-        $input_data = json_decode(file_get_contents("php://input"), true);
-
-        $this->form_validation->set_data($input_data);
-        $this->form_validation->set_rules('title', 'Title', 'required');
-        $this->form_validation->set_rules('status', 'Status', 'required');
+        $this->form_validation->set_rules('title', 'Title', 'required', ['title']);
+        $this->form_validation->set_rules('status', 'Status', 'required', ['status']);
 
         if ($this->form_validation->run() === FALSE) {
 
@@ -111,9 +112,9 @@ class Task extends CI_Controller
 
             $data = [
                 'user_id' => $this->AUTH_USER,
-                'title' => filter($input_data['title']),
-                'description' => filter($input_data['description'] ?? ""),
-                'status' => filter($input_data['status'])
+                'title' => filter($this->finput['title']),
+                'description' => filter($this->finput['description'] ?? ""),
+                'status' => filter($this->finput['status'])
             ];
 
             if($this->db->insert('task', $data)){
@@ -130,28 +131,25 @@ class Task extends CI_Controller
         return $response;
     }
 
-	private function update()
+	private function update($id)
 	{
 		$response = ['http_response_code' => 500, 'status' => 0, 'message' => 'Error occurred while requesting'];
 
-		$input_data = json_decode(file_get_contents("php://input"), true);
-
-		$this->form_validation->set_data($input_data);
         $this->form_validation->set_rules('id', 'ID', 'required');
 
-		if ($this->form_validation->run() === FALSE) {
+        if ($this->form_validation->run() === FALSE) {
 
 			$response = ['http_response_code' => 403 , 'status' => 0, 'message' => strip_tags(validation_errors())];
 
 		} else {
 
             $data = [
-                'title' => filter($input_data['title'] ?? ""),
-                'description' => filter($input_data['description'] ?? ""),
-                'status' => filter($input_data['status'] ?? "")
+                'title' => filter($this->finput['title'] ?? ""),
+                'description' => filter($this->finput['description'] ?? ""),
+                'status' => filter($this->finput['status'] ?? "")
             ];
 
-            if($this->db->update('task', $data, ['user_id' => $this->AUTH_USER, 'id' => filter($input_data['id'])])){
+            if($this->db->update('task', $data, ['user_id' => $this->AUTH_USER, 'id' => filter($id)])){
 
                 $response = [
                     'http_response_code' => 200, 'status' => 1,
@@ -165,13 +163,11 @@ class Task extends CI_Controller
 		return $response;
 	}
 
-	private function delete()
+	private function delete($id)
 	{
         $response = ['http_response_code' => 500, 'status' => 0, 'message' => 'Error occurred while requesting'];
 
-        $input_data = json_decode(file_get_contents("php://input"), true);
-
-        $this->form_validation->set_data($input_data);
+        $this->form_validation->set_data(["id" => $id]);
         $this->form_validation->set_rules('id', 'ID', 'required');
 
         if ($this->form_validation->run() === FALSE) {
@@ -180,7 +176,7 @@ class Task extends CI_Controller
 
         } else {
 
-            if($this->db->delete('task', ['user_id' => $this->AUTH_USER, 'id' => filter($input_data['id'])])){
+            if($this->db->delete('task', ['user_id' => $this->AUTH_USER, 'id' => filter($id)])){
 
                 $response = [
                     'http_response_code' => 200, 'status' => 1,
